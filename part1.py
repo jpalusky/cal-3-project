@@ -33,6 +33,11 @@ matrixD = np.matrix([
     [1, 1, 1],
     [2, 1, 0]
 ])
+matrixE = np.matrix([
+    [1, 1, 1],
+    [0, 1, 1],
+    [0, 1, 2]
+])
 
 def multiplyMatrices(matrix1, matrix2):
     matrix3 = np.zeros(shape=(matrix1.shape[0], matrix2.shape[1]))
@@ -149,9 +154,7 @@ def qr_fact_givens(matrix):
                 matrixG[currentIndex, currentIndex] = cos
 
                 #add g matrix and update matrix and pivot
-                gMatrixQueue.put(matrixG)
-                print "MAT"
-                print matrixG
+                gMatrixQueue.put(matrixG.transpose())
                 matrix = multiplyMatrices(matrixG, matrix)
                 x = matrix[diagonalIndex,diagonalIndex]
         diagonalIndex += 1
@@ -164,6 +167,8 @@ def qr_fact_givens(matrix):
     print matrixQ
     print matrix
     returnList = [matrixQ, matrix]
+    print "MULTIPLIED"
+    print multiplyMatrices(matrixQ, matrix)
     return returnList
 
 
