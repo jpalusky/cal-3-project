@@ -45,6 +45,26 @@ matrixF = np.matrix([
     [3, 3, 5]
 ])
 
+matrixTest = np.matrix([
+    [1, 1, 1, 1],
+    [1, 2, 3, 4],
+    [1, 3, 6, 10],
+    [1, 4, 10, 20]
+])
+
+matrixBTest = np.matrix([
+    [1],
+    [1/2],
+    [1/3],
+    [1/4]
+])
+
+matrixBExample = np.matrix([
+    [1],
+    [1],
+    [1],
+])
+
 def multiplyMatrices(matrix1, matrix2):
     matrix3 = np.zeros(shape=(matrix1.shape[0], matrix2.shape[1]))
     if matrix1.shape[1] != matrix2.shape[0]:
@@ -72,6 +92,7 @@ def lu_fact(matrix):
         if matrix[rowIndex, colIndex] != 0:
             for currentRow in range(rowIndex + 1, matrix.shape[0]):
                 currentLMatrix = np.identity(matrix.shape[0])
+                # THIS MAY BE BETTER --> if (matrixA[currentRow, colIndex] > 0 and matrixA[rowIndex, colIndex] > 0) or  (matrixA[currentRow, colIndex] < 0 and matrixA[rowIndex, colIndex] < 0):
                 if matrix[currentRow, colIndex] > 0:
                     currentLMatrix[currentRow, :] = currentLMatrix[currentRow, :] - currentLMatrix[rowIndex, :]*(float(matrix[currentRow, colIndex])/float(matrix[rowIndex, colIndex]))
                 else:
@@ -139,8 +160,6 @@ def qr_fact_househ(matrix):
     error = util.matrix_max_norm(multiplyMatrices(matrixQ, matrix) - originalMatrix)
 
     #Return Q and R
-    print matrixQ
-    print matrix
     returnList = [matrixQ, matrix, error]
     return returnList
 
@@ -194,13 +213,64 @@ def triangular_inverse(matrix):
             answer[currentRow, currentCol] = -answer[currentRow, currentCol]
     return answer
 
+def solve_lu_b(matrixA, matrixB):
+    lu = lu_fact(matrixA)
+    return solve_b(lu[1], solve_b(lu[0], matrixB))
+
+def solve_qr_b(matrixA, matrixB):
+    qr = qr_fact_givens(matrixA)
+    return solve_b(qr[1], solve_b(qr[0], matrixB))
+    #return solve_b(qr[1], multiplyMatrices(qr[0].transpose(), matrixB))
+
+def solve_b(matrixA, matrixB):
+    rowIndex = 0
+    colIndex = 0
+    matrixA = np.asmatrix(matrixA, dtype=np.float)
+    matrixB = np.asmatrix(matrixB, dtype=np.float)
+    #Get into echelon form
+    while rowIndex < matrixA.shape[0]:
+        if matrixA[rowIndex, colIndex] != 0:
+            for currentRow in range(rowIndex + 1, matrixA.shape[0]):
+                multiplier = (float(matrixA[currentRow, colIndex])/float(matrixA[rowIndex, colIndex]))
+                if (matrixA[currentRow, colIndex] > 0 and matrixA[rowIndex, colIndex] > 0) or (matrixA[currentRow, colIndex] < 0 and matrixA[rowIndex, colIndex] < 0):
+                    matrixA[currentRow, :] -= matrixA[rowIndex, :]*multiplier
+                    matrixB[currentRow, 0] -= matrixB[rowIndex, 0]*multiplier
+                else:
+                    matrixA[currentRow, :] += matrixA[rowIndex, :]*multiplier
+                    matrixB[currentRow, 0] += matrixB[rowIndex, 0]*multiplier
+        rowIndex = rowIndex + 1
+        colIndex = colIndex + 1
+
+    rowIndex = matrixA.shape[0] - 1
+    colIndex = matrixA.shape[0] - 1
+
+    #Get into reduced echelon form
+    while rowIndex > 0:
+        if matrixA[rowIndex, colIndex] != 0:
+            if matrixA[rowIndex, colIndex] > 0:
+                matrixB[rowIndex, 0] = float(matrixB[rowIndex, 0]) / float(-matrixA[rowIndex, colIndex])
+                matrixA[rowIndex, colIndex] /= float(-matrixA[rowIndex, colIndex])
+            else:
+                matrixB[rowIndex, 0] = float(matrixB[rowIndex, 0]) / float(matrixA[rowIndex, colIndex])
+                matrixA[rowIndex, colIndex] /= float(matrixA[rowIndex, colIndex])
+            for currentRow in range(rowIndex - 1, -1, -1):
+                multiplier = float(matrixA[currentRow, colIndex])
+                matrixA[currentRow, :] -= matrixA[rowIndex, :]*multiplier
+                matrixB[currentRow, 0] -= matrixB[rowIndex, 0]*multiplier
+        rowIndex = rowIndex - 1
+        colIndex = colIndex - 1
+    return matrixB
 
 #Testing stuff
 #print multiplyMatrices(matrixA, matrixB)
 
-#luList = lu_fact(matrixB)
-#print luList[2]
+#luList = lu_fact(matrixF)
+#print luList[1]
 
-#qr_fact_househ(matrixC)
-#givensList = qr_fact_givens(matrixD)
-#print givensList[2]
+#givensList = qr_fact_givens(matrixTest)
+#print givensList[1]
+
+print solve_qr_b(matrixTest, matrixBTest)
+
+#houseHolderList = qr_fact_househ(matrixTest)
+#print houseHolderList[1]
