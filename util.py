@@ -38,3 +38,10 @@ def triangular_inverse(matrix):
 def vector_length(matrix):
     return math.sqrt(np.dot(matrix[:, 0], matrix[:, 0]))
 
+def matrix_max_norm(matrix):
+    maxNorm = matrix[0,0]
+    for rowIndex in range(0, matrix.shape[0]):
+        for colIndex in range(0, matrix.shape[1]):
+            if matrix[rowIndex, colIndex] > maxNorm:
+                maxNorm = matrix[rowIndex, colIndex]
+    return maxNorm

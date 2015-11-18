@@ -5,6 +5,7 @@
 import numpy as np
 import math
 import Queue
+import util
 
 __author__ = 'JosiahMacbook'
 
@@ -38,6 +39,11 @@ matrixE = np.matrix([
     [0, 1, 1],
     [0, 1, 2]
 ])
+matrixF = np.matrix([
+    [2, -1, 1],
+    [3, 3, 9],
+    [3, 3, 5]
+])
 
 def multiplyMatrices(matrix1, matrix2):
     matrix3 = np.zeros(shape=(matrix1.shape[0], matrix2.shape[1]))
@@ -47,46 +53,47 @@ def multiplyMatrices(matrix1, matrix2):
     elif matrix1.shape[1] == 1 and matrix2.shape[0] == 1:
         for rowIndex in range(0, matrix1.shape[0]):
             for colIndex in range(0, matrix1.shape[1] + 1):
-                matrix3[rowIndex, colIndex] = round(np.dot(matrix1[rowIndex, 0], matrix2[0, colIndex]), 10)
+                matrix3[rowIndex, colIndex] = np.dot(matrix1[rowIndex, 0], matrix2[0, colIndex])
     elif matrix1.shape[0] == 1 and matrix2.shape[1] == 1:
-                matrix3 = round(np.dot(matrix1, matrix2), 10)
+                matrix3 = np.dot(matrix1, matrix2)
     else:
         for rowIndex in range(0, matrix1.shape[0]):
             for colIndex in range(0, matrix1.shape[1]):
-                matrix3[rowIndex, colIndex] = round(np.dot(matrix1[rowIndex, :], matrix2[:, colIndex]), 10)
+                matrix3[rowIndex, colIndex] = np.dot(matrix1[rowIndex, :], matrix2[:, colIndex])
     return matrix3
 
 def lu_fact(matrix):
-    lMatrixList = []
+    originalMatrix = matrix
+    lMatrixQueue = Queue.Queue()
     rowIndex = 0
     colIndex = 0
-    identityMatrix = np.identity(matrix.shape[0])
-    while (rowIndex < matrix.shape[1]):
+    while (rowIndex < matrix.shape[0]):
         if matrix[rowIndex, colIndex] != 0:
-            currentLMatrix = identityMatrix
             for currentRow in range(rowIndex + 1, matrix.shape[0]):
+                currentLMatrix = np.identity(matrix.shape[0])
                 if matrix[currentRow, colIndex] > 0:
-                    currentLMatrix[currentRow, :] = currentLMatrix[currentRow, :] - currentLMatrix[rowIndex, :]*(matrix[currentRow, colIndex]/matrix[rowIndex, colIndex])
+                    currentLMatrix[currentRow, :] = currentLMatrix[currentRow, :] - currentLMatrix[rowIndex, :]*(float(matrix[currentRow, colIndex])/float(matrix[rowIndex, colIndex]))
                 else:
-                    currentLMatrix[currentRow, :] = currentLMatrix[currentRow, :] + currentLMatrix[rowIndex, :]*(matrix[currentRow, colIndex]/matrix[rowIndex, colIndex])
+                    currentLMatrix[currentRow, :] = currentLMatrix[currentRow, :] + currentLMatrix[rowIndex, :]*(float(matrix[currentRow, colIndex])/float(matrix[rowIndex, colIndex]))
+                matrix = multiplyMatrices(currentLMatrix, matrix)
+                print "Lmatrix"
+                print currentLMatrix
                 currentLMatrix[currentRow, colIndex] = -currentLMatrix[currentRow, colIndex] #Changing the sign of the item so that we don't need to take the inverse later.
-                lMatrixList.append(currentLMatrix)
-        rowIndex = rowIndex + 2
-        colIndex = colIndex + 2
-    lMatrix = lMatrixList.pop()
-    for currentMatrix in range(1, len(lMatrixList)):
-        lMatrix = multiplyMatrices(lMatrix, lMatrixList.pop())
-    uMatrix = multiplyMatrices(triangular_inverse(lMatrix),matrix)
+                lMatrixQueue.put(currentLMatrix)
+        rowIndex = rowIndex + 1
+        colIndex = colIndex + 1
+    lMatrix = lMatrixQueue.get()
+    while not lMatrixQueue.empty():
+        lMatrix = multiplyMatrices(lMatrix, lMatrixQueue.get())
     print "L Matrix"
     print lMatrix
-    print "U Matrix:"
-    print uMatrix
-    print "Matrix: "
+    print "u Matrix: "
     print matrix
     print "Result Matrix: "
-    print multiplyMatrices(lMatrix,uMatrix)
+    print multiplyMatrices(lMatrix, matrix)
 
 def qr_fact_househ(matrix):
+    originalMatrix = matrix
     diagonalIndex = 0
     hMatrixQueue = Queue.Queue()
     while (diagonalIndex < matrix.shape[1] - 1):
@@ -126,14 +133,18 @@ def qr_fact_househ(matrix):
     while not hMatrixQueue.empty():
         matrixQ = multiplyMatrices(matrixQ, hMatrixQueue.get())
 
+    #Get error
+    error = util.matrix_max_norm(multiplyMatrices(matrixQ, matrix) - originalMatrix)
+
     #Return Q and R
     print matrixQ
     print matrix
-    returnList = [matrixQ, matrix]
+    returnList = [matrixQ, matrix, error]
     return returnList
 
 
 def qr_fact_givens(matrix):
+    originalMatrix = matrix
     diagonalIndex = 0
     gMatrixQueue = Queue.Queue()
     #while we still have diagonal elements
@@ -164,11 +175,10 @@ def qr_fact_givens(matrix):
     while not gMatrixQueue.empty():
         matrixQ = multiplyMatrices(matrixQ, gMatrixQueue.get())
 
-    print matrixQ
-    print matrix
-    returnList = [matrixQ, matrix]
-    print "MULTIPLIED"
-    print multiplyMatrices(matrixQ, matrix)
+    #Get error
+    error = util.matrix_max_norm(multiplyMatrices(matrixQ, matrix) - originalMatrix)
+
+    returnList = [matrixQ, matrix, error]
     return returnList
 
 
@@ -185,6 +195,7 @@ def triangular_inverse(matrix):
 
 #Testing stuff
 #print multiplyMatrices(matrixA, matrixB)
-#lu_fact(matrixC)
+lu_fact(matrixF)
 #qr_fact_househ(matrixC)
-qr_fact_givens(matrixD)
+#givensList = qr_fact_givens(matrixD)
+#print givensList[2]
