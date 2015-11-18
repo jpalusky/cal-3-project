@@ -28,6 +28,11 @@ matrixC = np.matrix([
     [0, 4, 2],
     [0, 3, 1]
 ])
+matrixD = np.matrix([
+    [1, 2, 0],
+    [1, 1, 1],
+    [2, 1, 0]
+])
 
 def multiplyMatrices(matrix1, matrix2):
     matrix3 = np.zeros(shape=(matrix1.shape[0], matrix2.shape[1]))
@@ -124,8 +129,42 @@ def qr_fact_househ(matrix):
 
 
 def qr_fact_givens(matrix):
+    diagonalIndex = 0
+    gMatrixQueue = Queue.Queue()
+    #while we still have diagonal elements
+    while (diagonalIndex < matrix.shape[1] - 1):
+        # X is the pivot
+        x = matrix[diagonalIndex, diagonalIndex]
+        for currentIndex in range(diagonalIndex + 1, matrix.shape[0]):
+            #y is at index below the pivot
+            y = matrix[currentIndex, diagonalIndex]
+            if y != 0:
+                # set cos and sin
+                cos = x/math.sqrt(x**2 + y**2)
+                sin = -y/math.sqrt(x**2 + y**2)
+                matrixG = np.identity(matrix.shape[0])
+                matrixG[diagonalIndex, diagonalIndex] = cos
+                matrixG[currentIndex, diagonalIndex] = sin
+                matrixG[diagonalIndex, currentIndex] = -sin
+                matrixG[currentIndex, currentIndex] = cos
 
-    return matrix
+                #add g matrix and update matrix and pivot
+                gMatrixQueue.put(matrixG)
+                print "MAT"
+                print matrixG
+                matrix = multiplyMatrices(matrixG, matrix)
+                x = matrix[diagonalIndex,diagonalIndex]
+        diagonalIndex += 1
+
+    #Form Q
+    matrixQ = gMatrixQueue.get()
+    while not gMatrixQueue.empty():
+        matrixQ = multiplyMatrices(matrixQ, gMatrixQueue.get())
+
+    print matrixQ
+    print matrix
+    returnList = [matrixQ, matrix]
+    return returnList
 
 
 def vector_length(matrix):
@@ -142,4 +181,5 @@ def triangular_inverse(matrix):
 #Testing stuff
 #print multiplyMatrices(matrixA, matrixB)
 #lu_fact(matrixC)
-qr_fact_househ(matrixC)
+#qr_fact_househ(matrixC)
+qr_fact_givens(matrixD)
