@@ -63,6 +63,7 @@ def multiplyMatrices(matrix1, matrix2):
     return matrix3
 
 def lu_fact(matrix):
+
     originalMatrix = matrix
     lMatrixQueue = Queue.Queue()
     rowIndex = 0
@@ -76,21 +77,22 @@ def lu_fact(matrix):
                 else:
                     currentLMatrix[currentRow, :] = currentLMatrix[currentRow, :] + currentLMatrix[rowIndex, :]*(float(matrix[currentRow, colIndex])/float(matrix[rowIndex, colIndex]))
                 matrix = multiplyMatrices(currentLMatrix, matrix)
-                print "Lmatrix"
-                print currentLMatrix
                 currentLMatrix[currentRow, colIndex] = -currentLMatrix[currentRow, colIndex] #Changing the sign of the item so that we don't need to take the inverse later.
                 lMatrixQueue.put(currentLMatrix)
         rowIndex = rowIndex + 1
         colIndex = colIndex + 1
+
+    #Form the L matrix
     lMatrix = lMatrixQueue.get()
     while not lMatrixQueue.empty():
         lMatrix = multiplyMatrices(lMatrix, lMatrixQueue.get())
-    print "L Matrix"
-    print lMatrix
-    print "u Matrix: "
-    print matrix
-    print "Result Matrix: "
-    print multiplyMatrices(lMatrix, matrix)
+
+    #Get error
+    error = util.matrix_max_norm(multiplyMatrices(lMatrix, matrix) - originalMatrix)
+
+    #Return
+    returnList = [lMatrix, matrix, error]
+    return returnList
 
 def qr_fact_househ(matrix):
     originalMatrix = matrix
@@ -195,7 +197,10 @@ def triangular_inverse(matrix):
 
 #Testing stuff
 #print multiplyMatrices(matrixA, matrixB)
-lu_fact(matrixF)
+
+#luList = lu_fact(matrixB)
+#print luList[2]
+
 #qr_fact_househ(matrixC)
 #givensList = qr_fact_givens(matrixD)
 #print givensList[2]
