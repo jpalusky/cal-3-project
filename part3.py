@@ -4,43 +4,58 @@ import random
 import util
 
 
-def power_method(matrix, initialEV, error, n):
+
+def power_method(matrix, ev, error, n):
     if matrix.shape[0] != matrix.shape[0]:
         print "matrix must be square"
         return
-    i = 1
-    lastEV = 0
-    ev = normalize(initialEV)
-    ev = np.matrix(ev)
-    vectorY = util.multiplyMatrices(matrix, ev)
-    ev = normalize(vectorY)
-    ev = np.matrix(ev)
-    evTransposed = ev.getT()
-    numeratorMatrix = util.multiplyMatrices(evTransposed, matrix)
-    numeratorMatrix = util.multiplyMatrices(numeratorMatrix, ev)
-    numerator = numeratorMatrix[0, 0]
-    denominatorMatrix = util.multiplyMatrices(evTransposed, ev)
-    denominator = denominatorMatrix[0, 0]
-    newEV = numerator / denominator
-    while (i < n and abs(newEV - lastEV) > error):
-        lastEV = newEV
-        ev = normalize(ev)
-        ev = np.matrix(ev)
-        vectorY = util.multiplyMatrices(matrix, ev)
-        ev = normalize(vectorY)
-        ev = np.matrix(ev)
-        evTransposed = ev.getT()
-        numeratorMatrix = util.multiplyMatrices(evTransposed, matrix)
-        numeratorMatrix = util.multiplyMatrices(numeratorMatrix, ev)
-        numerator = numeratorMatrix[0, 0]
-        denominatorMatrix = util.multiplyMatrices(evTransposed, ev)
-        denominator = denominatorMatrix[0, 0]
-        newEV = numerator / denominator
-        i += 1
-    if(i<n):
-        return [newEV, ev, i]
     else:
-        return "failure"
+        eValue=0
+        eVector=ev
+        for i in range(1, n):
+            eValueOld=eValue
+            eVectorOld=eVector
+            eVector=matrix*eVector
+            eValue=eVector[0,0]
+            eVector=1/eValue*eVector
+            if(abs(eValueOld-eValue)<error):
+                return [eValue, eVector, i]
+    return "failure"
+
+
+    # i = 1
+    # lastEV = 1
+    # ev = normalize(ev)
+    # ev = np.matrix(ev)
+    # vectorY = util.multiplyMatrices(matrix, ev)
+    # ev = normalize(vectorY)
+    # ev = np.matrix(ev)
+    # evTransposed = ev.getT()
+    # numeratorMatrix = util.multiplyMatrices(evTransposed, matrix)
+    # numeratorMatrix = util.multiplyMatrices(numeratorMatrix, ev)
+    # numerator = numeratorMatrix[0, 0]
+    # denominatorMatrix = util.multiplyMatrices(evTransposed, ev)
+    # denominator = denominatorMatrix[0, 0]
+    # newEV = numerator / denominator
+    # while (i < n and abs(newEV - lastEV) > error):
+    #     lastEV = newEV
+    #     ev = normalize(ev)
+    #     ev = np.matrix(ev)
+    #     vectorY = util.multiplyMatrices(matrix, ev)
+    #     ev = normalize(vectorY)
+    #     ev = np.matrix(ev)
+    #     evTransposed = ev.getT()
+    #     numeratorMatrix = util.multiplyMatrices(evTransposed, matrix)
+    #     numeratorMatrix = util.multiplyMatrices(numeratorMatrix, ev)
+    #     numerator = numeratorMatrix[0, 0]
+    #     denominatorMatrix = util.multiplyMatrices(evTransposed, ev)
+    #     denominator = denominatorMatrix[0, 0]
+    #     newEV = numerator / denominator
+    #     i += 1
+    # if(i<n):
+    #     return [newEV, ev, i]
+    # else:
+    #     return "failure"
 
 
 def normalize(v):
