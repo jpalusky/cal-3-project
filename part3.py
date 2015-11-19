@@ -3,11 +3,12 @@ from numpy import linalg as LA
 import random
 import util
 
+
 def power_method(matrix, initialEV, error, n):
     if matrix.shape[0] != matrix.shape[0]:
         print "matrix must be square"
         return
-    i = 0
+    i = 1
     lastEV = 0
     ev = normalize(initialEV)
     ev = np.matrix(ev)
@@ -21,9 +22,9 @@ def power_method(matrix, initialEV, error, n):
     denominatorMatrix = util.multiplyMatrices(evTransposed, ev)
     denominator = denominatorMatrix[0, 0]
     newEV = numerator / denominator
-    while (i < n or abs(newEV - lastEV) > error):
+    while (i < n and abs(newEV - lastEV) > error):
         lastEV = newEV
-        ev = normalize(initialEV)
+        ev = normalize(ev)
         ev = np.matrix(ev)
         vectorY = util.multiplyMatrices(matrix, ev)
         ev = normalize(vectorY)
@@ -36,7 +37,10 @@ def power_method(matrix, initialEV, error, n):
         denominator = denominatorMatrix[0, 0]
         newEV = numerator / denominator
         i += 1
-    return [newEV, ev, i]
+    if(i<n):
+        return [newEV, ev, i]
+    else:
+        return "failure"
 
 
 def normalize(v):
@@ -44,13 +48,35 @@ def normalize(v):
     return norm * v
 
 
+plot1 = open("plot1.txt", "w")
+plot2 = open("plot2.txt", "w")
+
 for x in range(0, 999):
+    out = ""
     matrixR = np.matrix([
         [random.uniform(-2, 2), random.uniform(-2, 2)],
         [random.uniform(-2, 2), random.uniform(-2, 2)]
     ])
-
     if matrixR[0, 0] * matrixR[1, 1] - matrixR[0, 1] * matrixR[1, 0] != 0:
         estimate = np.matrix([[1],
-                             [0]])
-        print power_method(matrixR, estimate, 0.00005, 100)
+                              [0]])
+        largest=power_method(matrixR, estimate, 0.00005, 100)
+        if largest!="failure":
+            #print "Largest  " + str(power_method(matrixR, estimate, 0.00005, 100))
+            trace=str(util.trace2x2(matrixR))
+            #print "trace " + trace
+            determinant=str(util.determinant2x2(matrixR))
+            #print "determinant " + determinant
+            out=out+trace+","+determinant+","+str(largest[2])+"\n"
+            plot1.write(out)
+        matrixR = util.inverse2x2(matrixR)
+        smallest=power_method(matrixR, estimate, 0.00005, 100)
+        out=""
+        if smallest!="failure":
+            #print "Smallest eigenvalue " + smallest
+            trace=str(util.trace2x2(matrixR))
+            determinant=str(util.determinant2x2(matrixR))
+            out=out+trace+","+determinant+","+str(smallest[2])+"\n"
+            plot2.write(out)
+plot1.close()
+plot2.close()
