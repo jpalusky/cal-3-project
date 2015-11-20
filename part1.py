@@ -208,17 +208,19 @@ def triangular_inverse(matrix):
 
 def solve_lu_b(matrixA, matrixB):
     lu = lu_fact(matrixA)
-    originalL = np.copy(lu[0])
-    originalU = np.copy(lu[1])
-    originalLU = multiplyMatrices(originalL, originalU)
-    return [solve_b(lu[1], solve_b(lu[0], matrixB)), originalLU]
+    luMultiplied = multiplyMatrices(lu[0], lu[1])
+    return [solve_b(lu[1], solve_b(lu[0], matrixB)), luMultiplied]
 
 def solve_qr_b(matrixA, matrixB):
     qr = qr_fact_givens(matrixA)
-    originalQ = np.copy(qr[0])
-    originalR = np.copy(qr[1])
-    return [originalQ, originalR, solve_b(qr[1], solve_b(qr[0], matrixB))]
-    #return solve_b(qr[1], multiplyMatrices(qr[0].transpose(), matrixB))
+    qrMultiplied = multiplyMatrices(qr[0], qr[1])
+    return [solve_b(qr[1], solve_b(qr[0], matrixB)), qrMultiplied]
+
+def solve_househ_b(matrixA, matrixB):
+    qr = qr_fact_househ(matrixA)
+    qrMultiplied = multiplyMatrices(qr[0], qr[1])
+    return [solve_b(qr[1], solve_b(qr[0], matrixB)), qrMultiplied]
+
 
 def solve_b(matrixA, matrixB):
     rowIndex = 0
@@ -276,7 +278,7 @@ def solve_paschal_lu():
         matrixA = form_paschal_matrix(n)
         matrixB = form_b_matrix(n)
         result = solve_lu_b(matrixA, np.copy(matrixB))
-        errorLU = util.matrix_max_norm(matrixA - result[1])
+        errorLU = util.matrix_max_norm(result[1] - matrixA)
         errorP = util.matrix_max_norm(multiplyMatrices(matrixA, result[0]) - matrixB)
         print "n = " + str(n)
         print "X solution:"
@@ -286,6 +288,40 @@ def solve_paschal_lu():
         print "Px-b error"
         print errorP
         print "\n"
+
+def solve_paschal_givens():
+    for n in range(2, 13):
+        matrixA = form_paschal_matrix(n)
+        matrixB = form_b_matrix(n)
+        result = solve_qr_b(matrixA, np.copy(matrixB))
+        errorQR = util.matrix_max_norm(result[1] - matrixA)
+        errorP = util.matrix_max_norm(multiplyMatrices(matrixA, result[0]) - matrixB)
+        print "n = " + str(n)
+        print "X solution:"
+        print result[0]
+        print "QR-P error"
+        print errorQR
+        print "Px-b error"
+        print errorP
+        print "\n"
+
+def solve_paschal_househ():
+    for n in range(2, 13):
+        matrixA = form_paschal_matrix(n)
+        matrixB = form_b_matrix(n)
+        result = solve_househ_b(matrixA, np.copy(matrixB))
+        errorQR = util.matrix_max_norm(result[1] - matrixA)
+        errorP = util.matrix_max_norm(multiplyMatrices(matrixA, result[0]) - matrixB)
+        print "n = " + str(n)
+        print "X solution:"
+        print result[0]
+        print "QR-P error"
+        print errorQR
+        print "Px-b error"
+        print errorP
+        print "\n"
+
+solve_paschal_givens()
 
 #Testing stuff
 #print multiplyMatrices(matrixA, matrixB)
