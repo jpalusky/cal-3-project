@@ -272,22 +272,21 @@ def form_b_matrix(n):
     return matrix
 
 def solve_paschal_lu():
-    for n in range(2, 3):
+    for n in range(2, 13):
         matrixA = form_paschal_matrix(n)
         matrixB = form_b_matrix(n)
-        result = solve_lu_b(matrixA, matrixB)
+        result = solve_lu_b(matrixA, np.copy(matrixB))
         errorLU = util.matrix_max_norm(matrixA - result[1])
-        print matrixA
-        print result[0]
-        print multiplyMatrices(matrixA, result[0])
-        #errorP = util.matrix_max_norm(multiplyMatrices(matrixA, result[0]) - matrixB)
+        errorP = util.matrix_max_norm(multiplyMatrices(matrixA, result[0]) - matrixB)
         print "n = " + str(n)
+        print "X solution:"
         print result[0]
+        print "LU-P error"
         print errorLU
-        #print errorP
+        print "Px-b error"
+        print errorP
         print "\n"
 
-solve_paschal_lu()
 #Testing stuff
 #print multiplyMatrices(matrixA, matrixB)
 
