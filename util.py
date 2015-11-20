@@ -3,13 +3,12 @@ import math
 
 def multiplyMatrices(matrix1, matrix2):
     matrix3 = np.zeros(shape=(matrix1.shape[0], matrix2.shape[1]))
-    # iterate through rows of X
-    for i in range(matrix1.shape[0]):
-       # iterate through columns of Y
-       for j in range(matrix2.shape[1]):
-           # iterate through rows of Y
-           for k in range(matrix1.shape[0]):
-               matrix3[i,j] += matrix1[i,k] * matrix2[k,j]
+    if matrix1.shape[1] != matrix2.shape[0]:
+        print "Cannot multiply these matrices"
+        return
+    for rowIndex in range(0, matrix1.shape[0]):
+            for colIndex in range(0, matrix1.shape[0]):
+                matrix3[rowIndex, colIndex] = np.dot(matrix1[rowIndex, :], matrix2[:, colIndex])
     return matrix3
 
     # matrix3 = np.zeros(shape=(matrix1.shape[0], matrix2.shape[1]))

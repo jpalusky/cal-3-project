@@ -70,15 +70,8 @@ def multiplyMatrices(matrix1, matrix2):
     if matrix1.shape[1] != matrix2.shape[0]:
         print "Cannot multiply these matrices"
         return
-    elif matrix1.shape[1] == 1 and matrix2.shape[0] == 1:
-        for rowIndex in range(0, matrix1.shape[0]):
-            for colIndex in range(0, matrix1.shape[1] + 1):
-                matrix3[rowIndex, colIndex] = np.dot(matrix1[rowIndex, 0], matrix2[0, colIndex])
-    elif matrix1.shape[0] == 1 and matrix2.shape[1] == 1:
-                matrix3 = np.dot(matrix1, matrix2)
-    else:
-        for rowIndex in range(0, matrix1.shape[0]):
-            for colIndex in range(0, matrix1.shape[1]):
+    for rowIndex in range(0, matrix1.shape[0]):
+            for colIndex in range(0, matrix1.shape[0]):
                 matrix3[rowIndex, colIndex] = np.dot(matrix1[rowIndex, :], matrix2[:, colIndex])
     return matrix3
 
@@ -136,7 +129,9 @@ def qr_fact_househ(matrix):
 
             #Creating the H matrix
             matrixH = np.identity(matrix.shape[0] - diagonalIndex)
-            matrixH = matrixH - (2/(vector_length(matrixU)**2))*multiplyMatrices(matrixU, matrixU.transpose())
+            print matrixU
+            print multiplyMatrices(matrixU, matrixU.transpose())
+            matrixH = matrixH - (2.0/(vector_length(matrixU)**2))*multiplyMatrices(matrixU, matrixU.transpose())
             matrixHFinal = matrixH
 
             #Putting H matrix in correct size
@@ -273,4 +268,5 @@ def solve_b(matrixA, matrixB):
 #print solve_lu_b(matrixTest, matrixBTest)
 
 #houseHolderList = qr_fact_househ(matrixTest)
+#print houseHolderList[0]
 #print houseHolderList[1]
