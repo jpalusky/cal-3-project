@@ -269,4 +269,4 @@ def solve_b(matrixA, matrixB):
 
 #houseHolderList = qr_fact_househ(matrixTest)
 #print houseHolderList[0]
-#print houseHolderList[1]
+#print houseHolderList[2]
