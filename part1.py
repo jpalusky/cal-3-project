@@ -54,15 +54,15 @@ matrixTest = np.matrix([
 
 matrixBTest = np.matrix([
     [1],
-    [1/2],
-    [1/3],
-    [1/4]
+    [1.0/2],
+    [1.0/3],
+    [1.0/4]
 ])
 
 matrixBExample = np.matrix([
     [1],
-    [1],
-    [1],
+    [2],
+    [3],
 ])
 
 def multiplyMatrices(matrix1, matrix2):
@@ -225,19 +225,18 @@ def solve_qr_b(matrixA, matrixB):
 def solve_b(matrixA, matrixB):
     rowIndex = 0
     colIndex = 0
-    matrixA = np.asmatrix(matrixA, dtype=np.float)
-    matrixB = np.asmatrix(matrixB, dtype=np.float)
     #Get into echelon form
     while rowIndex < matrixA.shape[0]:
         if matrixA[rowIndex, colIndex] != 0:
             for currentRow in range(rowIndex + 1, matrixA.shape[0]):
-                multiplier = (float(matrixA[currentRow, colIndex])/float(matrixA[rowIndex, colIndex]))
-                if (matrixA[currentRow, colIndex] > 0 and matrixA[rowIndex, colIndex] > 0) or (matrixA[currentRow, colIndex] < 0 and matrixA[rowIndex, colIndex] < 0):
-                    matrixA[currentRow, :] -= matrixA[rowIndex, :]*multiplier
-                    matrixB[currentRow, 0] -= matrixB[rowIndex, 0]*multiplier
-                else:
-                    matrixA[currentRow, :] += matrixA[rowIndex, :]*multiplier
-                    matrixB[currentRow, 0] += matrixB[rowIndex, 0]*multiplier
+                if matrixA[currentRow, colIndex] != 0:
+                    multiplier = (float(matrixA[currentRow, colIndex]) / matrixA[rowIndex, colIndex])
+                    if (matrixA[currentRow, colIndex] > 0 and matrixA[rowIndex, colIndex] > 0) or (matrixA[currentRow, colIndex] < 0 and matrixA[rowIndex, colIndex] < 0):
+                        matrixA[currentRow, :] -= matrixA[rowIndex, :]*multiplier
+                        matrixB[currentRow, :] -= matrixB[rowIndex, :]*multiplier
+                    else:
+                        matrixA[currentRow, :] += matrixA[rowIndex, :]*multiplier
+                        matrixB[currentRow, :] += matrixB[rowIndex, :]*multiplier
         rowIndex = rowIndex + 1
         colIndex = colIndex + 1
 
@@ -245,18 +244,18 @@ def solve_b(matrixA, matrixB):
     colIndex = matrixA.shape[0] - 1
 
     #Get into reduced echelon form
-    while rowIndex > 0:
+    while rowIndex >= 0:
         if matrixA[rowIndex, colIndex] != 0:
-            if matrixA[rowIndex, colIndex] > 0:
-                matrixB[rowIndex, 0] = float(matrixB[rowIndex, 0]) / float(-matrixA[rowIndex, colIndex])
-                matrixA[rowIndex, colIndex] /= float(-matrixA[rowIndex, colIndex])
-            else:
-                matrixB[rowIndex, 0] = float(matrixB[rowIndex, 0]) / float(matrixA[rowIndex, colIndex])
-                matrixA[rowIndex, colIndex] /= float(matrixA[rowIndex, colIndex])
-            for currentRow in range(rowIndex - 1, -1, -1):
-                multiplier = float(matrixA[currentRow, colIndex])
-                matrixA[currentRow, :] -= matrixA[rowIndex, :]*multiplier
-                matrixB[currentRow, 0] -= matrixB[rowIndex, 0]*multiplier
+            #Make pivot 1
+            matrixB[rowIndex, 0] = float(matrixB[rowIndex, 0]) / matrixA[rowIndex, colIndex]
+            matrixA[rowIndex, colIndex] /= float(matrixA[rowIndex, colIndex])
+            if rowIndex > 0:
+                #Zero above
+                for currentRow in range(rowIndex - 1, -1, -1):
+                    if matrixA[currentRow, colIndex] != 0:
+                        multiplier = float(matrixA[currentRow, colIndex])
+                        matrixA[currentRow, :] -= matrixA[rowIndex, :]*multiplier
+                        matrixB[currentRow, :] -= matrixB[rowIndex, :]*multiplier
         rowIndex = rowIndex - 1
         colIndex = colIndex - 1
     return matrixB
@@ -270,7 +269,8 @@ def solve_b(matrixA, matrixB):
 #givensList = qr_fact_givens(matrixTest)
 #print givensList[1]
 
-print solve_qr_b(matrixTest, matrixBTest)
+#print solve_qr_b(matrixTest, matrixBTest)
+#print solve_lu_b(matrixTest, matrixBTest)
 
 #houseHolderList = qr_fact_househ(matrixTest)
 #print houseHolderList[1]
