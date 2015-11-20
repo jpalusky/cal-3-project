@@ -71,7 +71,7 @@ def multiplyMatrices(matrix1, matrix2):
         print "Cannot multiply these matrices"
         return
     for rowIndex in range(0, matrix1.shape[0]):
-            for colIndex in range(0, matrix1.shape[0]):
+            for colIndex in range(0, matrix2.shape[1]):
                 matrix3[rowIndex, colIndex] = np.dot(matrix1[rowIndex, :], matrix2[:, colIndex])
     return matrix3
 
@@ -129,8 +129,6 @@ def qr_fact_househ(matrix):
 
             #Creating the H matrix
             matrixH = np.identity(matrix.shape[0] - diagonalIndex)
-            print matrixU
-            print multiplyMatrices(matrixU, matrixU.transpose())
             matrixH = matrixH - (2.0/(vector_length(matrixU)**2))*multiplyMatrices(matrixU, matrixU.transpose())
             matrixHFinal = matrixH
 
@@ -210,11 +208,16 @@ def triangular_inverse(matrix):
 
 def solve_lu_b(matrixA, matrixB):
     lu = lu_fact(matrixA)
-    return solve_b(lu[1], solve_b(lu[0], matrixB))
+    originalL = np.copy(lu[0])
+    originalU = np.copy(lu[1])
+    originalLU = multiplyMatrices(originalL, originalU)
+    return [solve_b(lu[1], solve_b(lu[0], matrixB)), originalLU]
 
 def solve_qr_b(matrixA, matrixB):
     qr = qr_fact_givens(matrixA)
-    return solve_b(qr[1], solve_b(qr[0], matrixB))
+    originalQ = np.copy(qr[0])
+    originalR = np.copy(qr[1])
+    return [originalQ, originalR, solve_b(qr[1], solve_b(qr[0], matrixB))]
     #return solve_b(qr[1], multiplyMatrices(qr[0].transpose(), matrixB))
 
 def solve_b(matrixA, matrixB):
@@ -255,6 +258,36 @@ def solve_b(matrixA, matrixB):
         colIndex = colIndex - 1
     return matrixB
 
+def form_paschal_matrix(n):
+    matrix = np.zeros(shape=(n, n))
+    for rowIndex in range(0, n):
+        for colIndex in range(0, n):
+            matrix[rowIndex, colIndex] = math.factorial((rowIndex + colIndex)) / (math.factorial(rowIndex)*math.factorial(colIndex))
+    return matrix
+
+def form_b_matrix(n):
+    matrix = np.zeros(shape=(n, 1))
+    for rowIndex in range(1, n + 1):
+        matrix[rowIndex - 1, 0] = 1.0/rowIndex
+    return matrix
+
+def solve_paschal_lu():
+    for n in range(2, 3):
+        matrixA = form_paschal_matrix(n)
+        matrixB = form_b_matrix(n)
+        result = solve_lu_b(matrixA, matrixB)
+        errorLU = util.matrix_max_norm(matrixA - result[1])
+        print matrixA
+        print result[0]
+        print multiplyMatrices(matrixA, result[0])
+        #errorP = util.matrix_max_norm(multiplyMatrices(matrixA, result[0]) - matrixB)
+        print "n = " + str(n)
+        print result[0]
+        print errorLU
+        #print errorP
+        print "\n"
+
+solve_paschal_lu()
 #Testing stuff
 #print multiplyMatrices(matrixA, matrixB)
 
