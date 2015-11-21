@@ -1,5 +1,6 @@
 import numpy as np
 from numpy import linalg as LA
+import matplotlib.pyplot as plt
 import random
 import util
 
@@ -22,51 +23,18 @@ def power_method(matrix, ev, error, n):
                 return [eValue, eVector, i]
     return "failure"
 
-
-    # i = 1
-    # lastEV = 1
-    # ev = normalize(ev)
-    # ev = np.matrix(ev)
-    # vectorY = util.multiplyMatrices(matrix, ev)
-    # ev = normalize(vectorY)
-    # ev = np.matrix(ev)
-    # evTransposed = ev.getT()
-    # numeratorMatrix = util.multiplyMatrices(evTransposed, matrix)
-    # numeratorMatrix = util.multiplyMatrices(numeratorMatrix, ev)
-    # numerator = numeratorMatrix[0, 0]
-    # denominatorMatrix = util.multiplyMatrices(evTransposed, ev)
-    # denominator = denominatorMatrix[0, 0]
-    # newEV = numerator / denominator
-    # while (i < n and abs(newEV - lastEV) > error):
-    #     lastEV = newEV
-    #     ev = normalize(ev)
-    #     ev = np.matrix(ev)
-    #     vectorY = util.multiplyMatrices(matrix, ev)
-    #     ev = normalize(vectorY)
-    #     ev = np.matrix(ev)
-    #     evTransposed = ev.getT()
-    #     numeratorMatrix = util.multiplyMatrices(evTransposed, matrix)
-    #     numeratorMatrix = util.multiplyMatrices(numeratorMatrix, ev)
-    #     numerator = numeratorMatrix[0, 0]
-    #     denominatorMatrix = util.multiplyMatrices(evTransposed, ev)
-    #     denominator = denominatorMatrix[0, 0]
-    #     newEV = numerator / denominator
-    #     i += 1
-    # if(i<n):
-    #     return [newEV, ev, i]
-    # else:
-    #     return "failure"
-
-
 def normalize(v):
     norm = LA.norm(v)
     return norm * v
 
 
-plot1 = open("plot1.txt", "w")
-plot2 = open("plot2.txt", "w")
-
-for x in range(0, 999):
+x1=[]
+y1=[]
+c1=[]
+x2=[]
+y2=[]
+c2=[]
+for i in range(0, 999):
     out = ""
     matrixR = np.matrix([
         [random.uniform(-2, 2), random.uniform(-2, 2)],
@@ -79,11 +47,10 @@ for x in range(0, 999):
         if largest!="failure":
             #print "Largest  " + str(power_method(matrixR, estimate, 0.00005, 100))
             trace=str(util.trace2x2(matrixR))
-            #print "trace " + trace
             determinant=str(util.determinant2x2(matrixR))
-            #print "determinant " + determinant
-            out=out+trace+","+determinant+","+str(largest[2])+"\n"
-            plot1.write(out)
+            x1.append(determinant)
+            y1.append(trace)
+            c1.append(largest[2])
         matrixR = util.inverse2x2(matrixR)
         smallest=power_method(matrixR, estimate, 0.00005, 100)
         out=""
@@ -91,7 +58,18 @@ for x in range(0, 999):
             #print "Smallest eigenvalue " + smallest
             trace=str(util.trace2x2(matrixR))
             determinant=str(util.determinant2x2(matrixR))
-            out=out+trace+","+determinant+","+str(smallest[2])+"\n"
-            plot2.write(out)
-plot1.close()
-plot2.close()
+
+            x2.append(determinant)
+            y2.append(trace)
+            c2.append(smallest[2])
+
+
+
+fig = plt.figure()
+
+ax1 = fig.add_subplot(211)
+ax1.scatter(x1, y1, c=c1, cmap='seismic')
+ax2 = fig.add_subplot(212)
+ax2.scatter(x2, y2, c=c2, cmap='seismic')
+
+plt.show()
