@@ -78,3 +78,6 @@ def trace2x2(matrix):
         print "this method only works with 2x2 matricies"
         return
     return matrix[0,0]+matrix[1,1]
+    
+def vector_length(matrix):
+    return math.sqrt(np.dot(matrix[:, 0], matrix[:, 0]))
