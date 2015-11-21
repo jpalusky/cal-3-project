@@ -273,55 +273,25 @@ def form_b_matrix(n):
         matrix[rowIndex - 1, 0] = 1.0/rowIndex
     return matrix
 
-def solve_paschal_lu():
+def solve_paschal(function, message):
     for n in range(2, 13):
         matrixA = form_paschal_matrix(n)
         matrixB = form_b_matrix(n)
-        result = solve_lu_b(matrixA, np.copy(matrixB))
+        result = function(matrixA, np.copy(matrixB))
         errorLU = util.matrix_max_norm(result[1] - matrixA)
         errorP = util.matrix_max_norm(multiplyMatrices(matrixA, result[0]) - matrixB)
         print "n = " + str(n)
         print "X solution:"
         print result[0]
-        print "LU-P error"
+        print message
         print errorLU
         print "Px-b error"
         print errorP
         print "\n"
 
-def solve_paschal_givens():
-    for n in range(2, 13):
-        matrixA = form_paschal_matrix(n)
-        matrixB = form_b_matrix(n)
-        result = solve_qr_b(matrixA, np.copy(matrixB))
-        errorQR = util.matrix_max_norm(result[1] - matrixA)
-        errorP = util.matrix_max_norm(multiplyMatrices(matrixA, result[0]) - matrixB)
-        print "n = " + str(n)
-        print "X solution:"
-        print result[0]
-        print "QR-P error"
-        print errorQR
-        print "Px-b error"
-        print errorP
-        print "\n"
-
-def solve_paschal_househ():
-    for n in range(2, 13):
-        matrixA = form_paschal_matrix(n)
-        matrixB = form_b_matrix(n)
-        result = solve_househ_b(matrixA, np.copy(matrixB))
-        errorQR = util.matrix_max_norm(result[1] - matrixA)
-        errorP = util.matrix_max_norm(multiplyMatrices(matrixA, result[0]) - matrixB)
-        print "n = " + str(n)
-        print "X solution:"
-        print result[0]
-        print "QR-P error"
-        print errorQR
-        print "Px-b error"
-        print errorP
-        print "\n"
-
-solve_paschal_givens()
+#solve_paschal(solve_qr_b, "QR-P error")
+#solve_paschal(solve_househ_b, "QR-P error")
+solve_paschal(solve_lu_b, "LU-P error")
 
 #Testing stuff
 #print multiplyMatrices(matrixA, matrixB)
