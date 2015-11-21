@@ -291,7 +291,7 @@ def solve_paschal(function, message):
 
 #solve_paschal(solve_qr_b, "QR-P error")
 #solve_paschal(solve_househ_b, "QR-P error")
-solve_paschal(solve_lu_b, "LU-P error")
+solve_paschal(solve_qr_b, "LU-P error")
 
 #Testing stuff
 #print multiplyMatrices(matrixA, matrixB)

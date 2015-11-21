@@ -7,7 +7,7 @@ def multiplyMatrices(matrix1, matrix2):
         print "Cannot multiply these matrices"
         return
     for rowIndex in range(0, matrix1.shape[0]):
-            for colIndex in range(0, matrix1.shape[0]):
+            for colIndex in range(0, matrix2.shape[1]):
                 matrix3[rowIndex, colIndex] = np.dot(matrix1[rowIndex, :], matrix2[:, colIndex])
     return matrix3
 
