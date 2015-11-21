@@ -93,3 +93,24 @@ def solve_paschal_househ():
         print "Px-b error"
         print errorP
         print "\n"
+
+
+
+
+trace0 = go.Scatter(
+    x = lu_lu_plot,
+    y = lu_lu_plot,
+    name = 'Test',
+    line = dict(
+        color = ('rgb(205, 12, 24'),
+        width = 4,
+        dash = 'dot')
+)
+
+data = trace0
+layout = dict(title = 'test',
+              xaxis = 'xTest',
+              yaxis = 'yTest'
+              )
+fig = dict(data=data, layout=layout)
+plot.iplot(fig, filename='styled-line')

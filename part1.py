@@ -3,6 +3,7 @@
 #Test
 
 import numpy as np
+import matplotlib.pyplot as plt
 import math
 import Queue
 import util
@@ -273,7 +274,15 @@ def form_b_matrix(n):
         matrix[rowIndex - 1, 0] = 1.0/rowIndex
     return matrix
 
-def solve_paschal(function, message):
+lu_lu_plot = []
+lu_px_plot = []
+givens_qr_plot = []
+givens_px_plot = []
+househ_qr_plot = []
+househ_px_plot = []
+n_list = [2,3,4,5,6,7,8,9,10,11,12]
+
+def solve_paschal(function, message, decompPlot, xPlot):
     for n in range(2, 13):
         matrixA = form_paschal_matrix(n)
         matrixB = form_b_matrix(n)
@@ -288,10 +297,60 @@ def solve_paschal(function, message):
         print "Px-b error"
         print errorP
         print "\n"
+        decompPlot.append(errorLU)
+        xPlot.append(errorP)
 
-#solve_paschal(solve_qr_b, "QR-P error")
-#solve_paschal(solve_househ_b, "QR-P error")
-solve_paschal(solve_qr_b, "LU-P error")
+
+
+solve_paschal(solve_lu_b, "LU-P error", lu_lu_plot, lu_px_plot)
+
+plt.plot(n_list, lu_lu_plot, 'ro')
+plt.plot(n_list, lu_lu_plot)
+plt.xlabel('n - value')
+plt.ylabel('LU - P Error')
+plt.title('LU Factorization: L - P Error vs N')
+plt.show()
+
+plt.plot(n_list, lu_px_plot, 'ro')
+plt.plot(n_list, lu_px_plot)
+plt.xlabel('n - value')
+plt.ylabel('LU Px - b Error')
+plt.title('LU Factorization: Px - b Error vs N')
+plt.show()
+
+solve_paschal(solve_qr_b, "QR-P error", givens_qr_plot, givens_px_plot)
+
+plt.plot(n_list, givens_qr_plot, 'ro')
+plt.plot(n_list, givens_qr_plot)
+plt.xlabel('n - value')
+plt.ylabel('Givens QR - P Error')
+plt.title('Givens Rotations: QR - P Error vs N')
+plt.show()
+
+plt.plot(n_list, givens_px_plot, 'ro')
+plt.plot(n_list, givens_px_plot)
+plt.xlabel('n - value')
+plt.ylabel('Givens Px - b Error')
+plt.title('Givens Rotations: Px - b Error vs N')
+plt.show()
+
+
+
+solve_paschal(solve_househ_b, "QR-P error", househ_qr_plot, househ_px_plot)
+
+plt.plot(n_list, househ_qr_plot, 'ro')
+plt.plot(n_list, househ_qr_plot)
+plt.xlabel('n - value')
+plt.title('Householder Reflections: QR - P Error vs N')
+plt.ylabel('Householder QR - P Error')
+plt.show()
+
+plt.plot(n_list, househ_px_plot, 'ro')
+plt.plot(n_list, househ_px_plot)
+plt.xlabel('n - value')
+plt.title('Householder Reflections: Px - b Error vs N')
+plt.ylabel('Householder Px - b Error')
+plt.show()
 
 #Testing stuff
 #print multiplyMatrices(matrixA, matrixB)
