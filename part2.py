@@ -1,8 +1,9 @@
+#Part 2 - Final Project
+
 from util import multiplyMatrices
 import math
 import numpy as np
 import random
-import xlwt
 
 A = np.matrix([
     [1., 1./2, 1./3],
@@ -98,53 +99,3 @@ def getAverage(jacobi_list, gs_list):
     err_jacobi = math.sqrt(dot_product(err_jacobi, err_jacobi))
     err_gs = math.sqrt(dot_product(err_gs, err_gs))
     return (x_jacobi, x_gs, err_jacobi, err_gs, count_ratio)
-
-def plot(filename):
-
-    book = xlwt.Workbook()
-    sheet1 = book.add_sheet("Sheet1")
-    sheet1.write(0, 0, "Jacobi")
-    sheet1.write(0, 3, "Gauss-Seidel")
-    sheet1.write(1, 0, "Initial error")
-    sheet1.write(1, 1, "steps")
-    sheet1.write(1, 3, "Initial error")
-    sheet1.write(1, 4, "steps")
-    sheet1.write(0, 6, "x-appr-jacobi")
-    sheet1.write(1, 6, "x-appr-gs")
-    sheet1.write(2, 6, "err-jacobi")
-    sheet1.write(3, 6, "err-gs")
-    sheet1.write(4, 6, "count-ratio-ave")
-
-    jacobi_list, gs_list = vector_100()
-    for i in range(100):
-        ini_error = jacobi_list[i][1] - jacobi_list[i][0]
-        ini_error = math.sqrt(dot_product(ini_error, ini_error))
-        sheet1.write(i + 2, 0, ini_error)
-        sheet1.write(i + 2, 1, jacobi_list[i][2])
-
-        ini_error = gs_list[i][1] - gs_list[i][0]
-        ini_error = math.sqrt(dot_product(ini_error, ini_error))
-        sheet1.write(i + 2, 3, ini_error)
-        sheet1.write(i + 2, 4, gs_list[i][2])
-
-
-    x_jacobi, x_gs, err_jacobi, err_gs, count_ratio = getAverage(jacobi_list, gs_list)
-    sheet1.write(0, 7, "{}".format(x_jacobi))
-    sheet1.write(1, 7, "{}".format(x_gs))
-    sheet1.write(2, 7, "{}".format(err_jacobi))
-    sheet1.write(3, 7, "{}".format(err_gs))
-    sheet1.write(4, 7, "{}".format(count_ratio))
-
-    book.save(filename)
-
-# x0 = np.matrix([
-#     [-3],
-#     [-0.1],
-#     [5]
-# ])
-# x0, soln, counter = jacobi_iter(x0, 0.00005, 100)
-# print("x0: {}".format(x0))
-# print("solution: {}".format(soln))
-# print("number of it'ns: {}".format(counter))
-
-plot("math2605_project_part2_plot_2.xls")

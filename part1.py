@@ -1,50 +1,12 @@
-#Final project for Calc 3 for Computer science.
-#Welcome. We are the bomb.
-#Test
+# Part 1 - Final Project
+
 
 import numpy as np
-import matplotlib.pyplot as plt
 import math
 import Queue
 import util
 
 __author__ = 'JosiahMacbook'
-
-matrixA = np.matrix([
-    [3, 4, 5, 6, 7],
-    [3, 4, 5, 6, 7],
-    [3, 4, 5, 6, 7],
-    [3, 4, 5, 6, 7],
-    [3, 4, 5, 6, 7],
-
-])
-matrixB = np.matrix([
-    [3, 4, 5, 6, 7],
-    [3, 4, 5, 6, 7],
-    [3, 4, 5, 6, 7],
-    [3, 4, 5, 6, 7],
-    [3, 4, 5, 6, 7],
-])
-matrixC = np.matrix([
-    [1, 2, 0],
-    [0, 4, 2],
-    [0, 3, 1]
-])
-matrixD = np.matrix([
-    [1, 2, 0],
-    [1, 1, 1],
-    [2, 1, 0]
-])
-matrixE = np.matrix([
-    [1, 1, 1],
-    [0, 1, 1],
-    [0, 1, 2]
-])
-matrixF = np.matrix([
-    [2, -1, 1],
-    [3, 3, 9],
-    [3, 3, 5]
-])
 
 matrixTest = np.matrix([
     [1, 1, 1, 1],
@@ -59,22 +21,6 @@ matrixBTest = np.matrix([
     [1.0/3],
     [1.0/4]
 ])
-
-matrixBExample = np.matrix([
-    [1],
-    [2],
-    [3],
-])
-
-def multiplyMatrices(matrix1, matrix2):
-    matrix3 = np.zeros(shape=(matrix1.shape[0], matrix2.shape[1]))
-    if matrix1.shape[1] != matrix2.shape[0]:
-        print "Cannot multiply these matrices"
-        return
-    for rowIndex in range(0, matrix1.shape[0]):
-            for colIndex in range(0, matrix2.shape[1]):
-                matrix3[rowIndex, colIndex] = np.dot(matrix1[rowIndex, :], matrix2[:, colIndex])
-    return matrix3
 
 def lu_fact(matrix):
 
@@ -304,66 +250,6 @@ def solve_paschal(function, message, decompPlot, xPlot):
 
 solve_paschal(solve_lu_b, "LU-P error", lu_lu_plot, lu_px_plot)
 
-plt.plot(n_list, lu_lu_plot, 'ro')
-plt.plot(n_list, lu_lu_plot)
-plt.xlabel('n - value')
-plt.ylabel('LU - P Error')
-plt.title('LU Factorization: L - P Error vs N')
-plt.show()
-
-plt.plot(n_list, lu_px_plot, 'ro')
-plt.plot(n_list, lu_px_plot)
-plt.xlabel('n - value')
-plt.ylabel('LU Px - b Error')
-plt.title('LU Factorization: Px - b Error vs N')
-plt.show()
-
 solve_paschal(solve_qr_b, "QR-P error", givens_qr_plot, givens_px_plot)
 
-plt.plot(n_list, givens_qr_plot, 'ro')
-plt.plot(n_list, givens_qr_plot)
-plt.xlabel('n - value')
-plt.ylabel('Givens QR - P Error')
-plt.title('Givens Rotations: QR - P Error vs N')
-plt.show()
-
-plt.plot(n_list, givens_px_plot, 'ro')
-plt.plot(n_list, givens_px_plot)
-plt.xlabel('n - value')
-plt.ylabel('Givens Px - b Error')
-plt.title('Givens Rotations: Px - b Error vs N')
-plt.show()
-
-
-
 solve_paschal(solve_househ_b, "QR-P error", househ_qr_plot, househ_px_plot)
-
-plt.plot(n_list, househ_qr_plot, 'ro')
-plt.plot(n_list, househ_qr_plot)
-plt.xlabel('n - value')
-plt.title('Householder Reflections: QR - P Error vs N')
-plt.ylabel('Householder QR - P Error')
-plt.show()
-
-plt.plot(n_list, househ_px_plot, 'ro')
-plt.plot(n_list, househ_px_plot)
-plt.xlabel('n - value')
-plt.title('Householder Reflections: Px - b Error vs N')
-plt.ylabel('Householder Px - b Error')
-plt.show()
-
-#Testing stuff
-#print multiplyMatrices(matrixA, matrixB)
-
-#luList = lu_fact(matrixF)
-#print luList[1]
-
-#givensList = qr_fact_givens(matrixTest)
-#print givensList[1]
-
-#print solve_qr_b(matrixTest, matrixBTest)
-#print solve_lu_b(matrixTest, matrixBTest)
-
-#houseHolderList = qr_fact_househ(matrixTest)
-#print houseHolderList[0]
-#print houseHolderList[2]

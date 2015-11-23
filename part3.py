@@ -1,3 +1,5 @@
+#Part 3 - Final Project
+
 import numpy as np
 from numpy import linalg as LA
 import matplotlib.pyplot as plt
@@ -29,17 +31,6 @@ def power_method(matrix, ev, error, n, inverse):
                     eValue = 1 / eValue
                 return [eValue, eVector, i]
         return "failure"
-        #         eValueOld=eValue
-        #         eVectorOld=eVector
-        #         eVector=util.multiplyMatrices(matrix,eVector)
-        #         eValue=eVector[0,0]
-        #         eVector=eVector/eValue
-        #         print eVector
-        #         if(abs(eValueOld-eValue)<error):
-        #             normalize(eVector)
-        #             return [eValue, eVector, i]
-        # return "failure"
-
 
 x1 = []
 y1 = []
@@ -58,8 +49,6 @@ for i in range(0, 999):
                               [0]])
         largest = power_method(matrixR, estimate, 0.00005, 100, False)
         if largest != "failure":
-            # print matrixR
-            # print "Largest  " + str(power_method(matrixR, estimate, 0.00005, 100))
             trace = str(util.trace2x2(matrixR))
             determinant = str(util.determinant2x2(matrixR))
             x1.append(determinant)
@@ -69,7 +58,6 @@ for i in range(0, 999):
         smallest = power_method(matrixRinverse, estimate, 0.00005, 100, True)
         out = ""
         if smallest != "failure":
-            # print "Smallest eigenvalue " + smallest
             trace = str(util.trace2x2(matrixRinverse))
             determinant = str(util.determinant2x2(matrixRinverse))
             x2.append(determinant)
@@ -90,28 +78,3 @@ for i in range(0, 999):
         print "Smallest Eigenvalue " + str(smallest[0])
         print "Smallest Eigenvector " + str(smallest[1])
         print "Number of iterations " + str(smallest[2])
-
-plt.scatter(x1, y1, c=c1, cmap='seismic')
-plt.xlabel('determinant')
-plt.ylabel('trace')
-plt.title("Power Method on matrix A")
-
-plt.show()
-plt.scatter(x2, y2, c=c2, cmap='seismic')
-plt.xlabel('determinant')
-plt.ylabel('trace')
-plt.title(r'Power method on matrix $A^{-1}$')
-plt.show()
-# fig = plt.figure()
-# ax1 = fig.add_subplot(211)
-# ax1.scatter(x1, y1, c=c1, cmap='seismic')
-# ax2 = fig.add_subplot(212)
-# ax2.scatter(x2, y2, c=c2, cmap='seismic')
-# ax1.set_title('Matrix A')
-# ax1.set_xlabel('determinant')
-# ax1.set_ylabel('trace')
-# ax2.set_title('Matrix A Inverse')
-# ax2.set_xlabel('determinant')
-# ax2.set_ylabel('trace')
-# plt.tight_layout(pad=0.4, w_pad=0, h_pad=1.0)
-# plt.show()
