@@ -1,5 +1,4 @@
 #Part 2 - Final Project
-
 from util import multiplyMatrices
 import math
 import numpy as np

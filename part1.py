@@ -1,6 +1,4 @@
 # Part 1 - Final Project
-
-
 import numpy as np
 import math
 import Queue
@@ -23,7 +21,6 @@ matrixBTest = np.matrix([
 ])
 
 def lu_fact(matrix):
-
     originalMatrix = matrix
     lMatrixQueue = Queue.Queue()
     rowIndex = 0
@@ -37,7 +34,7 @@ def lu_fact(matrix):
                     currentLMatrix[currentRow, :] = currentLMatrix[currentRow, :] - currentLMatrix[rowIndex, :]*(float(matrix[currentRow, colIndex])/float(matrix[rowIndex, colIndex]))
                 else:
                     currentLMatrix[currentRow, :] = currentLMatrix[currentRow, :] + currentLMatrix[rowIndex, :]*(float(matrix[currentRow, colIndex])/float(matrix[rowIndex, colIndex]))
-                matrix = multiplyMatrices(currentLMatrix, matrix)
+                matrix = util.multiplyMatrices(currentLMatrix, matrix)
                 currentLMatrix[currentRow, colIndex] = -currentLMatrix[currentRow, colIndex] #Changing the sign of the item so that we don't need to take the inverse later.
                 lMatrixQueue.put(currentLMatrix)
         rowIndex = rowIndex + 1
@@ -46,10 +43,10 @@ def lu_fact(matrix):
     #Form the L matrix
     lMatrix = lMatrixQueue.get()
     while not lMatrixQueue.empty():
-        lMatrix = multiplyMatrices(lMatrix, lMatrixQueue.get())
+        lMatrix = util.multiplyMatrices(lMatrix, lMatrixQueue.get())
 
     #Get error
-    error = util.matrix_max_norm(multiplyMatrices(lMatrix, matrix) - originalMatrix)
+    error = util.matrix_max_norm(util.multiplyMatrices(lMatrix, matrix) - originalMatrix)
 
     #Return
     returnList = [lMatrix, matrix, error]
@@ -76,7 +73,7 @@ def qr_fact_househ(matrix):
 
             #Creating the H matrix
             matrixH = np.identity(matrix.shape[0] - diagonalIndex)
-            matrixH = matrixH - (2.0/(vector_length(matrixU)**2))*multiplyMatrices(matrixU, matrixU.transpose())
+            matrixH = matrixH - (2.0/(vector_length(matrixU)**2))*util.multiplyMatrices(matrixU, matrixU.transpose())
             matrixHFinal = matrixH
 
             #Putting H matrix in correct size
@@ -89,20 +86,19 @@ def qr_fact_househ(matrix):
             #Put H in a queue
             hMatrixQueue.put(matrixHFinal)
             #Use matrix to form R
-            matrix = multiplyMatrices(matrixHFinal, matrix)
+            matrix = util.multiplyMatrices(matrixHFinal, matrix)
         diagonalIndex += 1
     #Form Q
     matrixQ = hMatrixQueue.get()
     while not hMatrixQueue.empty():
-        matrixQ = multiplyMatrices(matrixQ, hMatrixQueue.get())
+        matrixQ = util.multiplyMatrices(matrixQ, hMatrixQueue.get())
 
     #Get error
-    error = util.matrix_max_norm(multiplyMatrices(matrixQ, matrix) - originalMatrix)
+    error = util.matrix_max_norm(util.multiplyMatrices(matrixQ, matrix) - originalMatrix)
 
     #Return Q and R
     returnList = [matrixQ, matrix, error]
     return returnList
-
 
 def qr_fact_givens(matrix):
     originalMatrix = matrix
@@ -127,21 +123,20 @@ def qr_fact_givens(matrix):
 
                 #add g matrix and update matrix and pivot
                 gMatrixQueue.put(matrixG.transpose())
-                matrix = multiplyMatrices(matrixG, matrix)
+                matrix = util.multiplyMatrices(matrixG, matrix)
                 x = matrix[diagonalIndex,diagonalIndex]
         diagonalIndex += 1
 
     #Form Q
     matrixQ = gMatrixQueue.get()
     while not gMatrixQueue.empty():
-        matrixQ = multiplyMatrices(matrixQ, gMatrixQueue.get())
+        matrixQ = util.multiplyMatrices(matrixQ, gMatrixQueue.get())
 
     #Get error
-    error = util.matrix_max_norm(multiplyMatrices(matrixQ, matrix) - originalMatrix)
+    error = util.matrix_max_norm(util.multiplyMatrices(matrixQ, matrix) - originalMatrix)
 
     returnList = [matrixQ, matrix, error]
     return returnList
-
 
 def vector_length(matrix):
     return math.sqrt(np.dot(matrix[:, 0], matrix[:, 0]))
@@ -155,19 +150,18 @@ def triangular_inverse(matrix):
 
 def solve_lu_b(matrixA, matrixB):
     lu = lu_fact(matrixA)
-    luMultiplied = multiplyMatrices(lu[0], lu[1])
+    luMultiplied = util.multiplyMatrices(lu[0], lu[1])
     return [solve_b(lu[1], solve_b(lu[0], matrixB)), luMultiplied]
 
 def solve_qr_b(matrixA, matrixB):
     qr = qr_fact_givens(matrixA)
-    qrMultiplied = multiplyMatrices(qr[0], qr[1])
+    qrMultiplied = util.multiplyMatrices(qr[0], qr[1])
     return [solve_b(qr[1], solve_b(qr[0], matrixB)), qrMultiplied]
 
 def solve_househ_b(matrixA, matrixB):
     qr = qr_fact_househ(matrixA)
-    qrMultiplied = multiplyMatrices(qr[0], qr[1])
+    qrMultiplied = util.multiplyMatrices(qr[0], qr[1])
     return [solve_b(qr[1], solve_b(qr[0], matrixB)), qrMultiplied]
-
 
 def solve_b(matrixA, matrixB):
     rowIndex = 0
@@ -220,21 +214,13 @@ def form_b_matrix(n):
         matrix[rowIndex - 1, 0] = 1.0/rowIndex
     return matrix
 
-lu_lu_plot = []
-lu_px_plot = []
-givens_qr_plot = []
-givens_px_plot = []
-househ_qr_plot = []
-househ_px_plot = []
-n_list = [2,3,4,5,6,7,8,9,10,11,12]
-
 def solve_paschal(function, message, decompPlot, xPlot):
     for n in range(2, 13):
         matrixA = form_paschal_matrix(n)
         matrixB = form_b_matrix(n)
         result = function(matrixA, np.copy(matrixB))
         errorLU = util.matrix_max_norm(result[1] - matrixA)
-        errorP = util.matrix_max_norm(multiplyMatrices(matrixA, result[0]) - matrixB)
+        errorP = util.matrix_max_norm(util.multiplyMatrices(matrixA, result[0]) - matrixB)
         print "n = " + str(n)
         print "X solution:"
         print result[0]
@@ -246,10 +232,12 @@ def solve_paschal(function, message, decompPlot, xPlot):
         decompPlot.append(errorLU)
         xPlot.append(errorP)
 
-
-
+lu_lu_plot = []
+lu_px_plot = []
+givens_qr_plot = []
+givens_px_plot = []
+househ_qr_plot = []
+househ_px_plot = []
 solve_paschal(solve_lu_b, "LU-P error", lu_lu_plot, lu_px_plot)
-
 solve_paschal(solve_qr_b, "QR-P error", givens_qr_plot, givens_px_plot)
-
 solve_paschal(solve_househ_b, "QR-P error", househ_qr_plot, househ_px_plot)
