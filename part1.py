@@ -21,6 +21,8 @@ matrixBTest = np.matrix([
 ])
 
 def lu_fact(matrix):
+    if(isinstance(matrix, basestring)):
+        matrix = np.loadtxt(matrix, unpack=False, delimiter=",")
     originalMatrix = matrix
     lMatrixQueue = Queue.Queue()
     rowIndex = 0
@@ -30,7 +32,7 @@ def lu_fact(matrix):
             for currentRow in range(rowIndex + 1, matrix.shape[0]):
                 currentLMatrix = np.identity(matrix.shape[0])
                 # THIS MAY BE BETTER --> if (matrixA[currentRow, colIndex] > 0 and matrixA[rowIndex, colIndex] > 0) or  (matrixA[currentRow, colIndex] < 0 and matrixA[rowIndex, colIndex] < 0):
-                if matrix[currentRow, colIndex] > 0:
+                if (matrix[currentRow, colIndex] > 0 and matrix[rowIndex, colIndex] > 0) or (matrix[currentRow, colIndex] < 0 and matrix[rowIndex, colIndex] < 0):
                     currentLMatrix[currentRow, :] = currentLMatrix[currentRow, :] - currentLMatrix[rowIndex, :]*(float(matrix[currentRow, colIndex])/float(matrix[rowIndex, colIndex]))
                 else:
                     currentLMatrix[currentRow, :] = currentLMatrix[currentRow, :] + currentLMatrix[rowIndex, :]*(float(matrix[currentRow, colIndex])/float(matrix[rowIndex, colIndex]))
@@ -53,6 +55,8 @@ def lu_fact(matrix):
     return returnList
 
 def qr_fact_househ(matrix):
+    if(isinstance(matrix, basestring)):
+        matrix = np.loadtxt(matrix, unpack=False, delimiter=",")
     originalMatrix = matrix
     diagonalIndex = 0
     hMatrixQueue = Queue.Queue()
@@ -69,11 +73,11 @@ def qr_fact_househ(matrix):
             matrixU = np.zeros(shape=(matrix.shape[0] - diagonalIndex, 1))
             for currentIndex in range(0, matrix.shape[0] - diagonalIndex):
                 matrixU[currentIndex, 0] = matrix[diagonalIndex + currentIndex, diagonalIndex]
-            matrixU[0, 0] += vector_length(matrixU)
+            matrixU[0, 0] += util.vector_length(matrixU)
 
             #Creating the H matrix
             matrixH = np.identity(matrix.shape[0] - diagonalIndex)
-            matrixH = matrixH - (2.0/(vector_length(matrixU)**2))*util.multiplyMatrices(matrixU, matrixU.transpose())
+            matrixH = matrixH - (2.0/(util.vector_length(matrixU)**2))*util.multiplyMatrices(matrixU, matrixU.transpose())
             matrixHFinal = matrixH
 
             #Putting H matrix in correct size
@@ -101,6 +105,8 @@ def qr_fact_househ(matrix):
     return returnList
 
 def qr_fact_givens(matrix):
+    if(isinstance(matrix, basestring)):
+        matrix = np.loadtxt(matrix, unpack=False, delimiter=",")
     originalMatrix = matrix
     diagonalIndex = 0
     gMatrixQueue = Queue.Queue()
@@ -137,31 +143,6 @@ def qr_fact_givens(matrix):
 
     returnList = [matrixQ, matrix, error]
     return returnList
-
-def vector_length(matrix):
-    return math.sqrt(np.dot(matrix[:, 0], matrix[:, 0]))
-
-def triangular_inverse(matrix):
-    answer = np.copy(matrix)
-    for currentRow in range(1, answer.shape[0]):
-        for currentCol in range(0, currentRow):
-            answer[currentRow, currentCol] = -answer[currentRow, currentCol]
-    return answer
-
-def solve_lu_b(matrixA, matrixB):
-    lu = lu_fact(matrixA)
-    luMultiplied = util.multiplyMatrices(lu[0], lu[1])
-    return [solve_b(lu[1], solve_b(lu[0], matrixB)), luMultiplied]
-
-def solve_qr_b(matrixA, matrixB):
-    qr = qr_fact_givens(matrixA)
-    qrMultiplied = util.multiplyMatrices(qr[0], qr[1])
-    return [solve_b(qr[1], solve_b(qr[0], matrixB)), qrMultiplied]
-
-def solve_househ_b(matrixA, matrixB):
-    qr = qr_fact_househ(matrixA)
-    qrMultiplied = util.multiplyMatrices(qr[0], qr[1])
-    return [solve_b(qr[1], solve_b(qr[0], matrixB)), qrMultiplied]
 
 def solve_b(matrixA, matrixB):
     rowIndex = 0
@@ -201,6 +182,32 @@ def solve_b(matrixA, matrixB):
         colIndex = colIndex - 1
     return matrixB
 
+def solve_lu_b(matrixInput, function):
+    if(isinstance(matrixInput, basestring)):
+        matrixInput = np.loadtxt(matrixInput, unpack=False, delimiter=",")
+    matrixA = matrixInput[:, 0:matrixInput.shape[1]-1]
+    matrixB = np.matrix(matrixInput[:, [matrixInput.shape[1] - 1]])
+    matrixBCopy = np.copy(matrixB)
+    matrixACopy = np.copy(matrixA)
+    lu = lu_fact(matrixACopy)
+    matrixLCopy = np.copy(lu[0])
+    matrixUCopy = np.copy(lu[1])
+    xSolution = solve_b(matrixUCopy, solve_b(matrixLCopy, matrixBCopy))
+    return [xSolution, util.matrix_max_norm(util.multiplyMatrices(matrixA, xSolution) - matrixB), util.matrix_max_norm(util.multiplyMatrices(lu[0], lu[1]) - matrixA)]
+
+def solve_qr_b(matrixInput, function):
+    if(isinstance(matrixInput, basestring)):
+        matrixInput = np.loadtxt(matrixInput, unpack=False, delimiter=",")
+    matrixA = matrixInput[:, 0:matrixInput.shape[1]-1]
+    matrixB = np.matrix(matrixInput[:, [matrixInput.shape[1] - 1]])
+    matrixBCopy = np.copy(matrixB)
+    matrixACopy = np.copy(matrixA)
+    qr = function(matrixACopy)
+    matrixQCopy = np.copy(qr[0])
+    matrixRCopy = np.copy(qr[1])
+    xSolution = solve_b(matrixRCopy, solve_b(matrixQCopy, matrixBCopy))
+    return [xSolution, util.matrix_max_norm(util.multiplyMatrices(matrixA, xSolution) - matrixB), util.matrix_max_norm(util.multiplyMatrices(qr[0], qr[1]) - matrixA)]
+
 def form_paschal_matrix(n):
     matrix = np.zeros(shape=(n, n))
     for rowIndex in range(0, n):
@@ -214,23 +221,23 @@ def form_b_matrix(n):
         matrix[rowIndex - 1, 0] = 1.0/rowIndex
     return matrix
 
-def solve_paschal(function, message, decompPlot, xPlot):
+def solve_paschal(solveFunction, decompFunction, message, decompPlot, xPlot):
     for n in range(2, 13):
         matrixA = form_paschal_matrix(n)
         matrixB = form_b_matrix(n)
-        result = function(matrixA, np.copy(matrixB))
-        errorLU = util.matrix_max_norm(result[1] - matrixA)
-        errorP = util.matrix_max_norm(util.multiplyMatrices(matrixA, result[0]) - matrixB)
+        augmentedMatrix = np.concatenate((matrixA, matrixB), axis=1)
+        result = solveFunction(augmentedMatrix, decompFunction)
+        #errorP = util.matrix_max_norm(util.multiplyMatrices(matrixA, result[0]) - matrixB)
         print "n = " + str(n)
         print "X solution:"
         print result[0]
         print message
-        print errorLU
-        print "Px-b error"
-        print errorP
+        print result[2]
+        print "Px - b error"
+        print result[1]
         print "\n"
-        decompPlot.append(errorLU)
-        xPlot.append(errorP)
+        decompPlot.append(result[2])
+        xPlot.append(result[1])
 
 lu_lu_plot = []
 lu_px_plot = []
@@ -238,6 +245,6 @@ givens_qr_plot = []
 givens_px_plot = []
 househ_qr_plot = []
 househ_px_plot = []
-solve_paschal(solve_lu_b, "LU-P error", lu_lu_plot, lu_px_plot)
-solve_paschal(solve_qr_b, "QR-P error", givens_qr_plot, givens_px_plot)
-solve_paschal(solve_househ_b, "QR-P error", househ_qr_plot, househ_px_plot)
+#solve_paschal(solve_lu_b, None, "LU - P error", lu_lu_plot, lu_px_plot)
+#solve_paschal(solve_qr_b, qr_fact_givens, "QR - P error", givens_qr_plot, givens_px_plot)
+solve_paschal(solve_qr_b, qr_fact_househ, "QR - P error", househ_qr_plot, househ_px_plot)
