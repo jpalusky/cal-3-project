@@ -28,7 +28,7 @@ def matrix_max_norm(matrix):
         for colIndex in range(0, matrix.shape[1]):
             if math.fabs(matrix[rowIndex, colIndex]) > math.fabs(maxNorm):
                 maxNorm = matrix[rowIndex, colIndex]
-    return maxNorm
+    return math.fabs(maxNorm)
 
 def determinant2x2(matrix):
     if matrix.shape[0] != 2 and matrix.shape[1] != 2:

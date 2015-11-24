@@ -3,7 +3,7 @@ import numpy as np
 import math
 import Queue
 import util
-
+import matplotlib.pyplot as plt
 __author__ = 'JosiahMacbook'
 
 matrixTest = np.matrix([
@@ -22,7 +22,7 @@ matrixBTest = np.matrix([
 
 def lu_fact(matrix):
     if(isinstance(matrix, basestring)):
-        matrix = np.loadtxt(matrix, unpack=False, delimiter=",")
+        matrix = np.loadtxt(matrix, unpack=False, delimiter=" ")
     originalMatrix = matrix
     lMatrixQueue = Queue.Queue()
     rowIndex = 0
@@ -56,7 +56,7 @@ def lu_fact(matrix):
 
 def qr_fact_househ(matrix):
     if(isinstance(matrix, basestring)):
-        matrix = np.loadtxt(matrix, unpack=False, delimiter=",")
+        matrix = np.loadtxt(matrix, unpack=False, delimiter=" ")
     originalMatrix = matrix
     diagonalIndex = 0
     hMatrixQueue = Queue.Queue()
@@ -106,7 +106,7 @@ def qr_fact_househ(matrix):
 
 def qr_fact_givens(matrix):
     if(isinstance(matrix, basestring)):
-        matrix = np.loadtxt(matrix, unpack=False, delimiter=",")
+        matrix = np.loadtxt(matrix, unpack=False, delimiter=" ")
     originalMatrix = matrix
     diagonalIndex = 0
     gMatrixQueue = Queue.Queue()
@@ -182,9 +182,9 @@ def solve_b(matrixA, matrixB):
         colIndex = colIndex - 1
     return matrixB
 
-def solve_lu_b(matrixInput, function):
+def solve_lu_b(matrixInput):
     if(isinstance(matrixInput, basestring)):
-        matrixInput = np.loadtxt(matrixInput, unpack=False, delimiter=",")
+        matrixInput = np.loadtxt(matrixInput, unpack=False, delimiter=" ")
     matrixA = matrixInput[:, 0:matrixInput.shape[1]-1]
     matrixB = np.matrix(matrixInput[:, [matrixInput.shape[1] - 1]])
     matrixBCopy = np.copy(matrixB)
@@ -197,7 +197,7 @@ def solve_lu_b(matrixInput, function):
 
 def solve_qr_b(matrixInput, function):
     if(isinstance(matrixInput, basestring)):
-        matrixInput = np.loadtxt(matrixInput, unpack=False, delimiter=",")
+        matrixInput = np.loadtxt(matrixInput, unpack=False, delimiter=" ")
     matrixA = matrixInput[:, 0:matrixInput.shape[1]-1]
     matrixB = np.matrix(matrixInput[:, [matrixInput.shape[1] - 1]])
     matrixBCopy = np.copy(matrixB)
@@ -206,8 +206,32 @@ def solve_qr_b(matrixInput, function):
     matrixQCopy = np.copy(qr[0])
     matrixRCopy = np.copy(qr[1])
     xSolution = solve_b(matrixRCopy, solve_b(matrixQCopy, matrixBCopy))
-    print "ODD"
-    print util.multiplyMatrices(matrixA, xSolution) - matrixB
+    return [xSolution, util.matrix_max_norm(util.multiplyMatrices(matrixA, xSolution) - matrixB), util.matrix_max_norm(util.multiplyMatrices(qr[0], qr[1]) - matrixA)]
+
+def solve_givens_b(matrixInput):
+    if(isinstance(matrixInput, basestring)):
+        matrixInput = np.loadtxt(matrixInput, unpack=False, delimiter=" ")
+    matrixA = matrixInput[:, 0:matrixInput.shape[1]-1]
+    matrixB = np.matrix(matrixInput[:, [matrixInput.shape[1] - 1]])
+    matrixBCopy = np.copy(matrixB)
+    matrixACopy = np.copy(matrixA)
+    qr = qr_fact_givens(matrixACopy)
+    matrixQCopy = np.copy(qr[0])
+    matrixRCopy = np.copy(qr[1])
+    xSolution = solve_b(matrixRCopy, solve_b(matrixQCopy, matrixBCopy))
+    return [xSolution, util.matrix_max_norm(util.multiplyMatrices(matrixA, xSolution) - matrixB), util.matrix_max_norm(util.multiplyMatrices(qr[0], qr[1]) - matrixA)]
+
+def solve_househ_b(matrixInput):
+    if(isinstance(matrixInput, basestring)):
+        matrixInput = np.loadtxt(matrixInput, unpack=False, delimiter=" ")
+    matrixA = matrixInput[:, 0:matrixInput.shape[1]-1]
+    matrixB = np.matrix(matrixInput[:, [matrixInput.shape[1] - 1]])
+    matrixBCopy = np.copy(matrixB)
+    matrixACopy = np.copy(matrixA)
+    qr = qr_fact_househ(matrixACopy)
+    matrixQCopy = np.copy(qr[0])
+    matrixRCopy = np.copy(qr[1])
+    xSolution = solve_b(matrixRCopy, solve_b(matrixQCopy, matrixBCopy))
     return [xSolution, util.matrix_max_norm(util.multiplyMatrices(matrixA, xSolution) - matrixB), util.matrix_max_norm(util.multiplyMatrices(qr[0], qr[1]) - matrixA)]
 
 def form_paschal_matrix(n):
@@ -223,13 +247,12 @@ def form_b_matrix(n):
         matrix[rowIndex - 1, 0] = 1.0/rowIndex
     return matrix
 
-def solve_paschal(solveFunction, decompFunction, message, decompPlot, xPlot):
+def solve_paschal(solveFunction, message, decompPlot, xPlot):
     for n in range(2, 13):
         matrixA = form_paschal_matrix(n)
         matrixB = form_b_matrix(n)
         augmentedMatrix = np.concatenate((matrixA, matrixB), axis=1)
-        result = solveFunction(augmentedMatrix, decompFunction)
-        #errorP = util.matrix_max_norm(util.multiplyMatrices(matrixA, result[0]) - matrixB)
+        result = solveFunction(augmentedMatrix)
         print "n = " + str(n)
         print "X solution:"
         print result[0]
@@ -247,6 +270,34 @@ givens_qr_plot = []
 givens_px_plot = []
 househ_qr_plot = []
 househ_px_plot = []
-#solve_paschal(solve_lu_b, None, "LU - P error", lu_lu_plot, lu_px_plot)
-#solve_paschal(solve_qr_b, qr_fact_givens, "QR - P error", givens_qr_plot, givens_px_plot)
-solve_paschal(solve_qr_b, qr_fact_househ, "QR - P error", househ_qr_plot, househ_px_plot)
+solve_paschal(solve_lu_b, "LU - P error", lu_lu_plot, lu_px_plot)
+solve_paschal(solve_givens_b, "QR - P error", givens_qr_plot, givens_px_plot)
+solve_paschal(solve_househ_b, "QR - P error", househ_qr_plot, househ_px_plot)
+
+n_list = [2,3,4,5,6,7,8,9,10,11,12]
+
+def plot_stuff(n_list, data, xlabel, ylabel, title):
+    plt.plot(n_list, data, 'ro')
+    plt.plot(n_list, data)
+    plt.xlabel(xlabel)
+    plt.ylabel(ylabel)
+    plt.title(title)
+    plt.yscale('log')
+    plt.show()
+
+def plot_no_log(n_list, data, xlabel, ylabel, title):
+    plt.plot(n_list, data, 'ro')
+    plt.plot(n_list, data)
+    plt.xlabel(xlabel)
+    plt.ylabel(ylabel)
+    plt.title(title)
+    plt.show()
+
+plot_stuff(n_list, givens_qr_plot, 'N Value', 'Givens QR - P Error', 'Givens Rotations: QR - P Error vs N')
+plot_stuff(n_list, givens_px_plot, 'N Value', 'Givens Px - b Error', 'Givens Rotations: Px - b Error vs N')
+
+plot_stuff(n_list, househ_qr_plot, 'N Value', 'Householder QR - P Error', 'Householder: QR - P Error vs N')
+plot_stuff(n_list, househ_px_plot, 'N Value', 'Householder Px - b Error', 'Householder: Px - b Error vs N')
+
+plot_no_log(n_list, lu_lu_plot, 'N Value', 'LU - P Error', 'LU: LU - P Error vs N')
+plot_stuff(n_list, lu_px_plot, 'N Value', 'Px - b Error', 'LU: Px - b Error vs N')
