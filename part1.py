@@ -206,6 +206,8 @@ def solve_qr_b(matrixInput, function):
     matrixQCopy = np.copy(qr[0])
     matrixRCopy = np.copy(qr[1])
     xSolution = solve_b(matrixRCopy, solve_b(matrixQCopy, matrixBCopy))
+    print "ODD"
+    print util.multiplyMatrices(matrixA, xSolution) - matrixB
     return [xSolution, util.matrix_max_norm(util.multiplyMatrices(matrixA, xSolution) - matrixB), util.matrix_max_norm(util.multiplyMatrices(qr[0], qr[1]) - matrixA)]
 
 def form_paschal_matrix(n):
