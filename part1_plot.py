@@ -1,4 +1,4 @@
-# Part 1 - Final Project
+# Part 1 - Final Project WITH PLOT
 import numpy as np
 import math
 import Queue
