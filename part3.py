@@ -4,6 +4,11 @@ import random
 import util
 
 def power_method(matrix, ev, error, n, inverse):
+    if(isinstance(matrix, basestring)):
+        matrix = np.genfromtxt(matrix, unpack=False, delimiter=" ")
+    if(isinstance(ev, basestring)):
+        ev = np.genfromtxt(ev, unpack=False, delimiter=" ")
+        ev =np.reshape(ev, (ev.shape[0], 1))
     if matrix.shape[0] != matrix.shape[0]:
         print "matrix must be square"
         return
@@ -27,84 +32,87 @@ def power_method(matrix, ev, error, n, inverse):
         return "failure"
 
 
-x1 = []
-y1 = []
-c1 = []
-x2 = []
-y2 = []
-c2 = []
-for i in range(0, 999):
-    out = ""
-    largest=[]
-    smallest=[]
-    matrixR = np.matrix([
-        [random.uniform(-2, 2), random.uniform(-2, 2)],
-        [random.uniform(-2, 2), random.uniform(-2, 2)]
-    ])
-    if matrixR[0, 0] * matrixR[1, 1] - matrixR[0, 1] * matrixR[1, 0] != 0:
-        estimate = np.matrix([[1],
-                              [0]])
-        largest = power_method(matrixR, estimate, 0.00005, 100, False)
-        if largest != "failure":
-            # print matrixR
-            # print "Largest  " + str(power_method(matrixR, estimate, 0.00005, 100))
-            trace = str(util.trace2x2(matrixR))
-            determinant = str(util.determinant2x2(matrixR))
-            x1.append(determinant)
-            y1.append(trace)
-            c1.append(largest[2])
-        matrixRinverse = util.inverse2x2(matrixR)
-        smallest = power_method(matrixRinverse, estimate, 0.00005, 100, True)
-        out = ""
-        if smallest != "failure":
-            # print "Smallest eigenvalue " + smallest
-            trace = str(util.trace2x2(matrixRinverse))
-            determinant = str(util.determinant2x2(matrixRinverse))
-            x2.append(determinant)
-            y2.append(trace)
-            c2.append(smallest[2])
+# x1 = []
+# y1 = []
+# c1 = []
+# x2 = []
+# y2 = []
+# c2 = []
+# for i in range(0, 999):
+#     out = ""
+#     largest=[]
+#     smallest=[]
+#     matrixR = np.matrix([
+#         [random.uniform(-2, 2), random.uniform(-2, 2)],
+#         [random.uniform(-2, 2), random.uniform(-2, 2)]
+#     ])
+#     if matrixR[0, 0] * matrixR[1, 1] - matrixR[0, 1] * matrixR[1, 0] != 0:
+#         estimate = np.matrix([[1],
+#                               [0]])
+#         largest = power_method(matrixR, estimate, 0.00005, 100, False)
+#         if largest != "failure":
+#             # print matrixR
+#             # print "Largest  " + str(power_method(matrixR, estimate, 0.00005, 100))
+#             trace = str(util.trace2x2(matrixR))
+#             determinant = str(util.determinant2x2(matrixR))
+#             x1.append(determinant)
+#             y1.append(trace)
+#             c1.append(largest[2])
+#         matrixRinverse = util.inverse2x2(matrixR)
+#         smallest = power_method(matrixRinverse, estimate, 0.00005, 100, True)
+#         out = ""
+#         if smallest != "failure":
+#             # print "Smallest eigenvalue " + smallest
+#             trace = str(util.trace2x2(matrixRinverse))
+#             determinant = str(util.determinant2x2(matrixRinverse))
+#             x2.append(determinant)
+#             y2.append(trace)
+#             c2.append(smallest[2])
+#
+#     if (i == 0):
+#         print "Matrix A"
+#         print matrixR
+#         print ""
+#         print "Largest Eigenvalue " + str(largest[0])
+#         print "Largest Eigenvector " + str(largest[1])
+#         print "Number of iterations " + str(largest[2])
+#         print ""
+#         print "Matrix A inverse"
+#         print matrixRinverse
+#         print ""
+#         print "Smallest Eigenvalue " + str(smallest[0])
+#         print "Smallest Eigenvector " + str(smallest[1])
+#         print "Number of iterations " + str(smallest[2])
 
-    if (i == 0):
-        print "Matrix A"
-        print matrixR
-        print ""
-        print "Largest Eigenvalue " + str(largest[0])
-        print "Largest Eigenvector " + str(largest[1])
-        print "Number of iterations " + str(largest[2])
-        print ""
-        print "Matrix A inverse"
-        print matrixRinverse
-        print ""
-        print "Smallest Eigenvalue " + str(smallest[0])
-        print "Smallest Eigenvector " + str(smallest[1])
-        print "Number of iterations " + str(smallest[2])
-
-matrixTest = np.matrix([
-    [1, 1, 1, 1],
-    [1, 2, 3, 4],
-    [1, 3, 6, 10],
-    [1, 4, 10, 20]
-])
-estimate = np.matrix([[1],
-                      [0],
-                      [0],
-                      [0]])
-result=power_method(matrixTest,estimate,0.00005, 100, False)
-print 'Largest Eigenvalue ' + str(result[0])
-print "Largest Eigenvector " + str(result[1])
-print "Number of iterations " + str(result[2])
-print ""
+# matrixTest = np.matrix([
+#     [1, 1, 1, 1],
+#     [1, 2, 3, 4],
+#     [1, 3, 6, 10],
+#     [1, 4, 10, 20]
+# ])
+# estimate = np.matrix([[1],
+#                       [0],
+#                       [0],
+#                       [0]])
+# result=power_method(matrixTest,estimate,0.00005, 100, False)
+# print 'Largest Eigenvalue ' + str(result[0])
+# print "Largest Eigenvector " + str(result[1])
+# print "Number of iterations " + str(result[2])
+# print ""
+#
+#
+# matrixF = np.matrix([
+#     [2, -1, 1],
+#     [3, 3, 9],
+#     [3, 3, 5]
+# ])
+# estimate = np.matrix([[1],
+#                       [0],
+#                       [0]])
+# result=power_method(matrixF,estimate,0.00005, 100, False)
 
 
-matrixF = np.matrix([
-    [2, -1, 1],
-    [3, 3, 9],
-    [3, 3, 5]
-])
-estimate = np.matrix([[1],
-                      [0],
-                      [0]])
-result=power_method(matrixF,estimate,0.00005, 100, False)
+
 # plt.scatter(x1, y1, c=c1, cmap='seismic')
 # plt.xlabel('determinant')
 # plt.ylabel('trace')
