@@ -1,9 +1,7 @@
 import numpy as np
-from numpy import linalg as LA
 import matplotlib.pyplot as plt
 import random
 import util
-
 
 def power_method(matrix, ev, error, n, inverse):
     if matrix.shape[0] != matrix.shape[0]:
@@ -11,34 +9,22 @@ def power_method(matrix, ev, error, n, inverse):
         return
     else:
         matrixU = ev
-        matrixW = np.matrix([
-            [1],
-            [0]
-        ])
+        matrixW = np.zeros(shape=(ev.shape[0],1))
+        matrixW[0,0]=1
         eValue = 0
 
         for i in range(1, n):
             eValueOld = eValue
             oldMatrixU = matrixU
             matrixU = util.multiplyMatrices(matrix, matrixU)
-            eValue = np.dot(matrixW[:, 0].transpose(), matrixU[:, 0]) / np.dot(matrixW[:, 0].transpose(),
-                                                                               oldMatrixU[:, 0])
+            eValue = np.dot(matrixW.transpose(), matrixU) / np.dot(matrixW.transpose(),
+                                                                               oldMatrixU)
             if (abs(eValueOld - eValue) < error):
                 eVector = matrixU / util.vector_length(matrixU)
                 if (inverse == True):
                     eValue = 1 / eValue
                 return [eValue, eVector, i]
         return "failure"
-        #         eValueOld=eValue
-        #         eVectorOld=eVector
-        #         eVector=util.multiplyMatrices(matrix,eVector)
-        #         eValue=eVector[0,0]
-        #         eVector=eVector/eValue
-        #         print eVector
-        #         if(abs(eValueOld-eValue)<error):
-        #             normalize(eVector)
-        #             return [eValue, eVector, i]
-        # return "failure"
 
 
 x1 = []
@@ -49,6 +35,8 @@ y2 = []
 c2 = []
 for i in range(0, 999):
     out = ""
+    largest=[]
+    smallest=[]
     matrixR = np.matrix([
         [random.uniform(-2, 2), random.uniform(-2, 2)],
         [random.uniform(-2, 2), random.uniform(-2, 2)]
@@ -91,17 +79,43 @@ for i in range(0, 999):
         print "Smallest Eigenvector " + str(smallest[1])
         print "Number of iterations " + str(smallest[2])
 
-plt.scatter(x1, y1, c=c1, cmap='seismic')
-plt.xlabel('determinant')
-plt.ylabel('trace')
-plt.title("Power Method on matrix A")
+matrixTest = np.matrix([
+    [1, 1, 1, 1],
+    [1, 2, 3, 4],
+    [1, 3, 6, 10],
+    [1, 4, 10, 20]
+])
+estimate = np.matrix([[1],
+                      [0],
+                      [0],
+                      [0]])
+result=power_method(matrixTest,estimate,0.00005, 100, False)
+print 'Largest Eigenvalue ' + str(result[0])
+print "Largest Eigenvector " + str(result[1])
+print "Number of iterations " + str(result[2])
+print ""
 
-plt.show()
-plt.scatter(x2, y2, c=c2, cmap='seismic')
-plt.xlabel('determinant')
-plt.ylabel('trace')
-plt.title(r'Power method on matrix $A^{-1}$')
-plt.show()
+
+matrixF = np.matrix([
+    [2, -1, 1],
+    [3, 3, 9],
+    [3, 3, 5]
+])
+estimate = np.matrix([[1],
+                      [0],
+                      [0]])
+result=power_method(matrixF,estimate,0.00005, 100, False)
+# plt.scatter(x1, y1, c=c1, cmap='seismic')
+# plt.xlabel('determinant')
+# plt.ylabel('trace')
+# plt.title("Power Method on matrix A")
+#
+# plt.show()
+# plt.scatter(x2, y2, c=c2, cmap='seismic')
+# plt.xlabel('determinant')
+# plt.ylabel('trace')
+# plt.title(r'Power method on matrix $A^{-1}$')
+# plt.show()
 # fig = plt.figure()
 # ax1 = fig.add_subplot(211)
 # ax1.scatter(x1, y1, c=c1, cmap='seismic')
