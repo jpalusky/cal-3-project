@@ -1,8 +1,9 @@
-# Part 1 - Final Project
+# Part 1 - Final Project WITH PLOT
 import numpy as np
 import math
 import Queue
 import util
+import matplotlib.pyplot as plt
 __author__ = 'JosiahMacbook'
 
 matrixTest = np.matrix([
@@ -272,3 +273,31 @@ househ_px_plot = []
 solve_paschal(solve_lu_b, "LU - P error", lu_lu_plot, lu_px_plot)
 solve_paschal(solve_givens_b, "QR - P error", givens_qr_plot, givens_px_plot)
 solve_paschal(solve_househ_b, "QR - P error", househ_qr_plot, househ_px_plot)
+
+n_list = [2,3,4,5,6,7,8,9,10,11,12]
+
+def plot_stuff(n_list, data, xlabel, ylabel, title):
+    plt.plot(n_list, data, 'ro')
+    plt.plot(n_list, data)
+    plt.xlabel(xlabel)
+    plt.ylabel(ylabel)
+    plt.title(title)
+    plt.yscale('log')
+    plt.show()
+
+def plot_no_log(n_list, data, xlabel, ylabel, title):
+    plt.plot(n_list, data, 'ro')
+    plt.plot(n_list, data)
+    plt.xlabel(xlabel)
+    plt.ylabel(ylabel)
+    plt.title(title)
+    plt.show()
+
+plot_stuff(n_list, givens_qr_plot, 'N Value', 'Givens QR - P Error', 'Givens Rotations: QR - P Error vs N')
+plot_stuff(n_list, givens_px_plot, 'N Value', 'Givens Px - b Error', 'Givens Rotations: Px - b Error vs N')
+
+plot_stuff(n_list, househ_qr_plot, 'N Value', 'Householder QR - P Error', 'Householder: QR - P Error vs N')
+plot_stuff(n_list, househ_px_plot, 'N Value', 'Householder Px - b Error', 'Householder: Px - b Error vs N')
+
+plot_no_log(n_list, lu_lu_plot, 'N Value', 'LU - P Error', 'LU: LU - P Error vs N')
+plot_stuff(n_list, lu_px_plot, 'N Value', 'Px - b Error', 'LU: Px - b Error vs N')

@@ -1,9 +1,9 @@
+#Part 2 - Final Project
 from util import multiplyMatrices
 import math
 import numpy as np
 import random
 import xlwt
-
 A = np.matrix([
     [1., 1./2, 1./3],
     [1./2, 1., 1./4],
@@ -17,8 +17,8 @@ B = np.matrix([
 ])
 
 x_exact = np.matrix([
-    [9.0/190.], 
-    [28./475], 
+    [9.0/190.],
+    [28./475],
     [33./475]
 ])
 
@@ -37,7 +37,7 @@ def inverse_lower_3x3(matrix):
     ans[2, 2] = 1. / f
     return ans
 
-def iter(x0, sigma, m, S, T): 
+def iter(x0, sigma, m, S, T):
     S_inv = inverse_lower_3x3(S)
     counter = 1
     x_cur = x0
@@ -71,8 +71,8 @@ def vector_100():
 
     for i in range(100):
         x0 = np.matrix([
-            [random.uniform(-1, 1)], 
-            [random.uniform(-1, 1)], 
+            [random.uniform(-1, 1)],
+            [random.uniform(-1, 1)],
             [random.uniform(-1, 1)]
         ])
         jacobi_list.append(jacobi_iter(x0, 0.00005, 100))
@@ -148,3 +148,4 @@ def plot(filename):
 # print("number of it'ns: {}".format(counter))
 
 plot("math2605_project_part2_plot_2.xls")
+
